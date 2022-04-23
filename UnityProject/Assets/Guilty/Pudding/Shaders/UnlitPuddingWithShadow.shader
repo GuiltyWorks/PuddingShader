@@ -32,18 +32,21 @@ Shader "Guilty/UnlitPuddingWithShadow" {
 
             #pragma vertex vert
             #pragma fragment frag
+            #pragma multi_compile_instancing
             #pragma multi_compile_fog
 
             #include "UnityCG.cginc"
 
             struct appdata {
                 float4 vertex : POSITION;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct v2f {
-                float3 worldPos : TEXCOORD0;
-                UNITY_FOG_COORDS(1)
                 float4 vertex : SV_POSITION;
+                float3 worldPos : TEXCOORD0;
+                UNITY_VERTEX_OUTPUT_STEREO
+                UNITY_FOG_COORDS(1)
             };
 
             float4 _CaramelColor;
@@ -62,6 +65,9 @@ Shader "Guilty/UnlitPuddingWithShadow" {
 
             v2f vert(appdata v) {
                 v2f o;
+                UNITY_INITIALIZE_OUTPUT(v2f, o);
+                UNITY_SETUP_INSTANCE_ID(v);
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
                 UNITY_TRANSFER_FOG(o, o.vertex);
